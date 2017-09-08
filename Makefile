@@ -9,7 +9,9 @@ depends:
 	go get -v
 
 build:
-	go build -v -o  $(TARGET) *.go
+	GOOS=linux GOARCH=amd64 go build -o bin/linux/$(TARGET)
+	GOOS=windows GOARCH=amd64 go build -o bin/windows/$(TARGET).exe
+	GOOS=darwin GOARCH=amd64 go build -o bin/mac/$(TARGET)
 
 fmt:
 	go fmt *.go

@@ -8,7 +8,6 @@ import (
 
 	"github.com/meshbird/meshbird/log"
 	"github.com/meshbird/meshbird/network/protocol"
-	"github.com/meshbird/meshbird/secure"
 )
 
 var (
@@ -58,12 +57,6 @@ func (rn *RemoteNode) listen(ln *LocalNode) {
 		ln.NetTable().RemoveRemoteNode(rn.privateIP)
 	}()
 
-	iface, ok := ln.Service("iface").(*InterfaceService)
-	if !ok {
-		rn.logger.Error("interface service not found")
-		return
-	}
-
 	rn.logger.Debug("listening...")
 
 	for {
@@ -80,18 +73,7 @@ func (rn *RemoteNode) listen(ln *LocalNode) {
 		switch pack.Data.Type {
 		case protocol.TypeTransfer:
 			rn.logger.Debug("Writing to interface...")
-			payloadEncrypted := pack.Data.Msg.(protocol.TransferMessage).Bytes()
-			payload, errDec := secure.DecryptIV(payloadEncrypted, ln.State().Secret.Key)
-			if errDec != nil {
-				rn.logger.Error("error on decrypt, %v", err)
-				break
-			}
-			srcAddr := net.IP(payload[12:16])
-			dstAddr := net.IP(payload[16:20])
-			rn.logger.Info("received packet from %s to %s", srcAddr.String(), dstAddr.String())
-			if err = iface.WritePacket(payload); err != nil {
-				rn.logger.Error("write packet err: %s", err)
-			}
+
 		case protocol.TypeHeartbeat:
 			rn.logger.Debug("heardbeat received, %v", pack.Data.Msg)
 			rn.lastHeartbeat = time.Now()

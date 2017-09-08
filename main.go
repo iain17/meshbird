@@ -69,7 +69,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "loglevel",
-			Value:       "warning",
+			Value:       "debug",
 			Usage:       "set log level",
 			Destination: &LogLevel,
 			EnvVar:      "MESHBIRD_LOG_LEVEL",
